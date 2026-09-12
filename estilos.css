@@ -370,42 +370,23 @@ body{
   filter:brightness(.62);   /* la misma penumbra que la portada: van seguidas */
 }
 
-/* ---------- Grupo (panel plegable) ----------
-   El grupo es ahora un PANEL PLEGABLE y elegante. Aparece CONTRAÍDO: con
-   el grupo cerrado solo se ve su encabezado —título, alerta e imagen,
-   igual que antes— más una flecha que invita a abrirlo. Al pulsar se
-   despliega la lista de platos. El plegado lo hace el navegador con
-   <details>/<summary>: carta.js solo cambió las etiquetas del encabezado,
-   no la lógica ni el contenido.
+/* ---------- Grupo (plegable) ----------
+   El grupo es el de siempre —separado del anterior solo por el aire, sin
+   marco ni fondo que lo encierre— pero ahora PLEGABLE: nace contraído y,
+   cerrado, conserva su título, su alerta y su imagen. Lo único que se
+   añade es una flecha que gira al abrirlo.
+   El margen de arriba es lo que separa un grupo del siguiente. */
+.grupo{ margin:58px 0 0; }
 
-   Cada panel se separa del siguiente con aire y se recorta con esquinas
-   suaves, para leerse como una pieza cerrada. En móvil deja un margen a
-   los lados; en escritorio se centra (ver la media query). */
-.grupo{
-  margin:20px 12px 0;
-  border:1px solid var(--borde);
-  border-radius:16px;
-  background:var(--noche-alto);
-  overflow:hidden;
-  transition:border-color .18s ease;
-}
-.grupo:first-child{ margin-top:30px; }
-.grupo[open],
-.grupo:hover{ border-color:var(--borde-claro); }
-
-/* Dentro del panel, el carril de lectura lo marca el propio panel: se
-   neutraliza .columna para no sumar el relleno lateral dos veces. */
-.grupo .columna{ max-width:none; margin-inline:0; padding-inline:0; }
-
-/* El encabezado es el resorte que abre y cierra (summary). Se oculta el
-   triangulito por defecto del navegador; la flecha propia lo sustituye. */
+/* El encabezado es ahora el resorte que abre y cierra (summary): puntero
+   de mano y sin el triangulito por defecto del navegador. */
 .grupo__cabecera{
   cursor:pointer; list-style:none;
   -webkit-tap-highlight-color:transparent;
 }
 .grupo__cabecera::-webkit-details-marker{ display:none; }
 
-/* La flecha que gira al desplegar, como en el filtro de alérgenos. */
+/* La flecha que gira al desplegar, la misma idea que el filtro de alérgenos. */
 .grupo__flecha{
   flex:none; width:20px; height:20px;
   color:var(--hueso-suave);
@@ -414,13 +395,13 @@ body{
 .grupo[open] .grupo__flecha{ transform:rotate(180deg); }
 .grupo__cabecera:hover .grupo__flecha{ color:var(--ambar); }
 
-/* Sin foto: título en cursiva, línea fina y flecha, en una fila cómoda
-   para el dedo. La línea se estira y separa el título de la flecha; si hay
+/* Sin foto: título en cursiva, línea fina y la flecha al final, en una
+   fila dentro del carril de lectura (por eso nada toca el borde). Si hay
    alerta, baja a su propia línea sin deformar la píldora. */
 .grupo__cabecera--simple{
   display:flex; flex-wrap:wrap; align-items:center;
-  gap:12px 16px;
-  padding:18px 16px; margin:0;
+  gap:10px 16px;
+  margin:0 auto 26px;
 }
 .grupo__cabecera--simple .grupo__titulo{ order:1; }
 .grupo__cabecera--simple .grupo__regla{ order:2; }
@@ -432,7 +413,8 @@ body{
   order:5; flex:0 0 auto;
 }
 .grupo__titulo{
-  margin:0; flex-shrink:0;
+  margin:0;
+  flex-shrink:0;
   font-family:var(--display); font-style:italic; font-weight:500;
   font-size:1.3rem; letter-spacing:-.01em;
   color:var(--ambar);
@@ -441,74 +423,64 @@ body{
   flex:1; width:auto; height:1px; background:var(--borde);
 }
 
-/* Con foto: el encabezado ES la banda con la imagen. El título va
-   superpuesto abajo a la izquierda; la flecha, en una píldora, arriba a la
-   derecha, para que se vea siempre sobre la foto. */
+/* Con foto: banda con la imagen, SIN marco ni línea que la encierre. El
+   título va superpuesto y a media altura, alineado con el carril de
+   lectura; la flecha, en una discreta píldora, arriba a la derecha y
+   siempre separada del borde. */
 .grupo__cabecera--imagen{
   position:relative;
-  min-height:clamp(120px, 26vw, 190px);
-  padding:0; margin:0;
+  height:clamp(118px, 26vw, 190px);
+  margin:0 0 24px;
   overflow:hidden;
-  display:flex; align-items:flex-end;
-  background:var(--noche-hondo);
+  display:flex;
+  align-items:center;      /* el rótulo, a media altura de la banda */
+  background:var(--noche-alto);
 }
 .grupo__imagen{
   position:absolute; inset:0;
   width:100%; height:100%;
-  display:block; object-fit:cover;
-  filter:brightness(.52);
+  display:block;
+  object-fit:cover;
+  filter:brightness(.48);   /* bien apagada: el título tiene que ganar */
 }
-/* Velo de abajo arriba: el título blanco se lee siempre sobre la foto. */
-.grupo__cabecera--imagen::after{
-  content:""; position:absolute; inset:0;
-  background:linear-gradient(to top, rgba(0,0,0,.62), transparent 60%);
-  pointer-events:none;
-}
-/* El rótulo apila título y, debajo, la alerta del grupo si la hay. */
+/* El rótulo apila el título y, debajo, la alerta del grupo si la hay. */
 .grupo__rotulo{
-  position:relative; z-index:2; width:100%;
-  padding:0 16px 16px;
+  position:relative;
+  z-index:2;
+  width:100%;
   display:flex; flex-direction:column; align-items:flex-start; gap:8px;
 }
 .grupo__cabecera--imagen .grupo__titulo{
-  font-size:1.5rem; color:#FFFFFF;
+  font-size:1.5rem;
   text-shadow:0 2px 12px rgba(0,0,0,.6);
 }
 .grupo__cabecera--imagen .grupo__flecha{
-  position:absolute; top:12px; right:12px; z-index:3;
+  position:absolute; top:14px; right:20px; z-index:3;
   width:34px; height:34px; padding:7px;
   border-radius:100px;
-  background:rgba(0,0,0,.42); backdrop-filter:blur(8px);
-  border:1px solid rgba(255,255,255,.16);
+  background:rgba(0,0,0,.4); backdrop-filter:blur(8px);
   color:#FFFFFF;
 }
 
-/* Si la foto del grupo falla, el encabezado cae al formato sobrio. */
+/* Si la foto del grupo falla, se cae al encabezado sobrio de siempre. */
 .grupo__cabecera--sin-imagen{
-  min-height:0; background:none;
+  height:auto;
+  background:none;
   display:flex; flex-wrap:wrap; align-items:center;
-  gap:12px 16px; padding:18px 16px;
+  gap:10px 16px;
+  margin-bottom:26px;
 }
-.grupo__cabecera--sin-imagen::after{ display:none; }
 .grupo__cabecera--sin-imagen .grupo__rotulo{
   position:static; width:auto; flex:1; padding:0;
-  flex-direction:row; flex-wrap:wrap; align-items:center; gap:12px 16px;
+  flex-direction:row; flex-wrap:wrap; align-items:center; gap:10px 16px;
 }
-.grupo__cabecera--sin-imagen .grupo__titulo{
-  font-size:1.3rem; color:var(--ambar); text-shadow:none;
-}
+.grupo__cabecera--sin-imagen .grupo__titulo{ font-size:1.3rem; text-shadow:none; }
 .grupo__cabecera--sin-imagen .grupo__flecha{
   position:static; width:20px; height:20px; padding:0;
-  background:none; border:none; backdrop-filter:none;
-  color:var(--hueso-suave);
+  background:none; backdrop-filter:none; color:var(--hueso-suave);
 }
 
-/* La lista de platos, ya desplegada, con relleno propio dentro del panel
-   para no tocar los bordes redondeados. */
-.grupo__items{
-  display:grid;
-  padding:2px 16px 8px;
-}
+.grupo__items{ display:grid; }
 
 /* ---------- Ítem ---------- */
 .item{
@@ -713,13 +685,12 @@ body{
 @media (min-width:760px){
   .grupo__items{ grid-template-columns:1fr 1fr; column-gap:56px; }
 
-  /* Con más pantalla, el panel se centra y respira algo más, por fuera
-     (entre grupos) y por dentro (relleno del encabezado y de la lista). */
-  .grupo{ margin:30px auto 0; max-width:var(--ancho-banda); }
-  .grupo:first-child{ margin-top:40px; }
+  /* Con más pantalla, más aire entre grupos y bajo cada encabezado. */
+  .grupo{ margin-top:76px; }
   .grupo__cabecera--simple,
-  .grupo__cabecera--sin-imagen{ padding:22px 26px; }
-  .grupo__items{ padding:6px 26px 16px; }
+  .grupo__cabecera--sin-imagen{ margin-bottom:34px; }
+  .grupo__cabecera--imagen{ margin-bottom:38px; }
+  .grupo__cabecera--simple{ align-items:center; gap:14px 18px; }
   .item__foto{ width:104px; }
   /* La portada gana altura: se le pone un alto mínimo que crece con la
      ventana (con tope, para que en un monitor muy alto no se desmadre)
@@ -731,18 +702,24 @@ body{
   .lienzo{ padding:0 0 84px; }
   .columna{ padding-inline:24px; }
 
-  /* En escritorio la banda del grupo se vuelve una tira ancha y baja
-     DENTRO del propio panel; el título sigue abajo a la izquierda. */
+  /* En escritorio la banda del grupo no va de borde a borde: se centra,
+     deja un margen a los lados (nunca toca el borde de la pantalla) y crece
+     a lo alto con su ancho. Sin marco: solo esquinas suaves. */
   .grupo__cabecera--imagen{
-    min-height:0;
-    aspect-ratio:5/1;
-    max-height:220px;
+    width:calc(100% - 48px);
+    max-width:var(--ancho-banda);
+    margin-inline:auto;
+    height:auto;
+    aspect-ratio:4/1;
+    max-height:260px;
+    border-radius:14px;
   }
-  .grupo__rotulo{ padding:0 26px 20px; }
-  /* Si la foto del grupo falla, el encabezado vuelve a alto automático. */
+  /* Si la foto del grupo falla, se deshace todo lo anterior. */
   .grupo__cabecera--sin-imagen{
+    width:auto;
     aspect-ratio:auto;
     max-height:none;
+    border-radius:0;
   }
   .barra__lista{ padding:0 16px; }
   .barra__btn{ padding:20px 18px 18px; }
