@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plantilla Lab</title>
+  <meta name="description" content="Carta online.">
+  <meta name="theme-color" content="#12100E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+  <!-- Cabecera: rótulo del negocio -->
+  <header class="cabecera" id="cabecera">
+    <!-- Foto de fondo de la portada, si el negocio la pone (negocio.portada
+         en carta.json). Si no hay, queda el halo de siempre. -->
+    <img class="cabecera__fondo" id="cabeceraFondo" alt="" hidden>
+    <div class="cabecera__halo" aria-hidden="true"></div>
+
+    <div class="idioma" role="group" aria-label="Idioma / Language">
+      <button class="idioma__btn" data-idioma="es" type="button">ES</button>
+      <span class="idioma__separador" aria-hidden="true"></span>
+      <button class="idioma__btn" data-idioma="en" type="button">EN</button>
+    </div>
+
+    <div class="cabecera__interior">
+      <p class="cabecera__lema" data-t="lema"></p>
+      <!-- La marca del negocio: logotipo y título. Puede haber los dos,
+           solo el logotipo o solo el título; lo decide apariencia.json
+           y lo pinta carta.js. -->
+      <div class="cabecera__marca" id="cabeceraMarca">
+        <img class="cabecera__logo" id="cabeceraLogo" alt="" hidden>
+        <h1 class="cabecera__nombre" data-t="nombre">Cargando…</h1>
+      </div>
+    </div>
+  </header>
+
+  <!-- Cabecera de la sección elegida: su imagen de fondo y su nombre.
+       Va ENCIMA de la barra y pegada a ella. Lo rellena carta.js. -->
+  <div class="cabecera-seccion" id="cabeceraSeccion"></div>
+
+  <!-- Barra de secciones: se elige una sección y debajo salen sus grupos.
+       Según los ajustes de la página, carta.js la deja aquí (apoyada en el
+       borde de abajo de la foto de la sección) o la sube antes de la foto
+       (apoyada en el borde de arriba). -->
+  <nav class="barra" id="barra">
+    <div class="barra__lista" id="indice" role="tablist" aria-label="Secciones de la carta"></div>
+  </nav>
+
+  <!-- Grupos de la sección elegida -->
+  <main class="lienzo" id="carta" role="tabpanel" tabindex="0">
+    <p class="estado" id="estado" data-t="cargando">Cargando la carta…</p>
+  </main>
+
+  <!-- Filtro de alérgenos, plegado por defecto. Según los ajustes de la
+       página, carta.js lo deja aquí (al final, pegado al pie) o lo sube
+       justo debajo de la foto de la sección, antes de los grupos. -->
+  <details class="filtro" id="filtro">
+    <summary class="filtro__resumen">
+      <span class="filtro__etiqueta" data-t="alergenosTitulo">Alérgenos</span>
+      <span class="filtro__marca" id="filtroMarca" hidden></span>
+      <svg class="filtro__flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m6 9 6 6 6-6"/>
+      </svg>
+    </summary>
+    <div class="filtro__cuerpo">
+      <p class="filtro__ayuda" data-t="alergenosAyuda"></p>
+      <ul class="filtro__lista" id="leyenda"></ul>
+      <button class="filtro__limpiar" id="limpiarFiltros" type="button" hidden data-t="limpiar"></button>
+    </div>
+  </details>
+
+  <footer class="pie">
+    <span class="pie__marca" aria-hidden="true"></span>
+
+    <!-- Mensajes del negocio (horarios, avisos, agradecimientos…).
+         Los escribe el dueño en los ajustes de la página; los pinta carta.js. -->
+    <div class="pie__bloques" id="pieBloques" hidden></div>
+
+    <p class="pie__fecha"><span data-t="actualizadoPre"></span> <span data-campo="actualizado">—</span></p>
+    <p class="pie__nota" data-t="ivaNota"></p>
+
+    <!-- Redes sociales del negocio, abajo del todo. También de los ajustes. -->
+    <nav class="pie__redes" id="pieRedes" aria-label="Redes sociales" hidden></nav>
+  </footer>
+
+  <script src="carta.js"></script>
+</body>
+</html>

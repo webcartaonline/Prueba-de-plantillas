@@ -1,0 +1,760 @@
+/* =========================================================
+   Carta online — diseño "Nocturno" (editorial, oscuro)
+   Negro cálido, ámbar y hueso. Serif de display con cuerpo
+   geométrico. Estructura: barra superior de secciones y,
+   debajo, los grupos de la sección elegida.
+   La lógica va en carta.js.
+   ========================================================= */
+
+:root{
+  --noche:       #12100E;   /* fondo general */
+  --noche-alto:  #1A1613;   /* superficies elevadas */
+  --noche-hondo: #0C0A09;   /* barra y pie */
+  --borde:       #2C2620;
+  --borde-claro: #3A322A;
+
+  --hueso:       #F4EFE7;   /* texto principal */
+  --hueso-medio: #BFB5A6;   /* texto secundario */
+  --hueso-suave: #8E8578;   /* texto terciario */
+
+  --ambar:       #E9B44C;   /* acento principal */
+  --ambar-hondo: #C4902F;
+  --ladrillo:    #D2603A;   /* avisos de alérgeno */
+  --salvia:      #86A98C;   /* platos sin alérgenos */
+
+  /* Colores derivados. Son los de siempre escritos de otra forma;
+     existen como variables para que carta.js pueda recalcularlos
+     cuando el negocio elige sus propios colores en apariencia.json. */
+  --acento-halo: rgba(233,180,76,.16);   /* iluminación de la cabecera */
+  --barra-fondo: rgba(12,10,9,.9);       /* fondo translúcido de la barra */
+  --barra-velo:  rgba(18,16,14,.55);     /* la misma barra, pero sobre la foto */
+  --barra-alto:  57px;                   /* lo mide carta.js en vivo */
+
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --ui:      "Space Grotesk", system-ui, -apple-system, sans-serif;
+
+  --ancho: 1080px;        /* carril de lectura: texto y platos */
+  --ancho-banda: 1200px;  /* bandas de grupo en escritorio: un poco más anchas */
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+[hidden]{ display:none !important; }
+
+body{
+  margin:0;
+  background:var(--noche);
+  color:var(--hueso);
+  font-family:var(--ui);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *,*::before,*::after{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+}
+
+:focus-visible{ outline:2px solid var(--ambar); outline-offset:3px; }
+
+/* =========================================================
+   CABECERA
+   ========================================================= */
+.cabecera{
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid var(--borde);
+  /* En móvil el idioma va en el flujo, centrado sobre el rótulo. */
+  display:flex; flex-direction:column; align-items:center;
+}
+
+/* Foto de fondo de la portada. Se oscurece un poco, sin degradado,
+   lo justo para que el título en blanco se lea encima. Sin borde por
+   debajo: si la sección también lleva foto, las dos van seguidas. */
+.cabecera__fondo{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  display:block;
+  object-fit:cover;
+  filter:brightness(.32);
+}
+.cabecera--con-fondo{ border-bottom:none; }
+.cabecera--con-fondo .cabecera__halo{ display:none; }
+.cabecera--con-fondo .cabecera__nombre{
+  color:#FFFFFF;
+  text-shadow:0 2px 16px rgba(0,0,0,.55);
+}
+.cabecera--con-fondo .cabecera__lema{ text-shadow:0 1px 8px rgba(0,0,0,.6); }
+
+.cabecera__halo{
+  position:absolute; inset:-60% 0 auto 0; height:200%;
+  background:radial-gradient(58% 46% at 50% 34%, var(--acento-halo), transparent 68%);
+  pointer-events:none;
+}
+.cabecera__interior{
+  position:relative; width:100%;
+  max-width:var(--ancho); margin:0 auto;
+  padding:44px 20px 92px;
+  text-align:center;
+}
+.cabecera__lema{
+  margin:0 0 14px;
+  font-size:.66rem; font-weight:500;
+  letter-spacing:.32em; text-transform:uppercase;
+  color:var(--ambar);
+}
+.cabecera__nombre{
+  margin:0;
+  font-family:var(--display); font-weight:600;
+  font-size:clamp(2.6rem, 12vw, 5rem);
+  line-height:.98; letter-spacing:-.02em;
+  color:var(--hueso);
+}
+
+/* La marca del negocio: el logotipo y el título conviven en fila y,
+   si no caben (móvil con logo ancho), el título baja debajo del logo.
+   El logotipo conserva siempre su forma: sea apaisado o cuadrado,
+   nunca se estira ni se recorta. */
+.cabecera__marca{
+  display:flex; align-items:center; justify-content:center;
+  flex-wrap:wrap;
+  gap:10px 22px;
+}
+.cabecera__logo{
+  display:block;
+  width:auto; height:auto;
+  max-height:clamp(56px, 12vw, 110px);
+  max-width:min(72vw, 420px);
+  object-fit:contain;
+}
+/* Sin título (el logo ya lleva el nombre dentro): el logotipo
+   protagoniza la portada y puede crecer un poco más. */
+.cabecera__marca--solo-logo .cabecera__logo{
+  max-height:clamp(84px, 18vw, 170px);
+  max-width:min(86vw, 560px);
+}
+
+/* Selector de idioma: dos rótulos separados por una barra fina.
+   Móvil: centrado en el flujo, encima del lema.
+   Escritorio: anclado arriba a la derecha (ver media query). */
+.idioma{
+  position:relative; z-index:3;
+  margin-top:36px;
+  display:inline-flex; align-items:center; gap:2px;
+}
+.idioma__separador{
+  width:1px; height:12px; background:var(--borde-claro);
+}
+.idioma__btn{
+  border:none; background:none; cursor:pointer;
+  padding:6px 9px; min-height:32px;
+  font-family:var(--ui); font-weight:500; font-size:.68rem;
+  letter-spacing:.16em; color:var(--hueso-suave);
+  transition:color .15s ease;
+}
+.idioma__btn:hover{ color:var(--hueso-medio); }
+.idioma__btn[aria-pressed="true"]{ color:var(--ambar); }
+
+/* Sobre la foto de la portada los dos rótulos se pierden, así que se les
+   pone una píldora oscura y borrosa por debajo. Sin foto no hace falta:
+   el fondo ya es liso y la píldora solo sería ruido. */
+.cabecera--con-fondo .idioma{
+  padding:2px 6px;
+  border-radius:100px;
+  background:rgba(0,0,0,.38);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.14);
+}
+.cabecera--con-fondo .idioma__separador{ background:rgba(255,255,255,.3); }
+.cabecera--con-fondo .idioma__btn:not([aria-pressed="true"]){ color:rgba(255,255,255,.78); }
+.cabecera--con-fondo .idioma__btn:not([aria-pressed="true"]):hover{ color:#FFFFFF; }
+
+/* =========================================================
+   BARRA SUPERIOR DE SECCIONES
+   Pegada arriba. En móvil se desliza con el dedo.
+   ========================================================= */
+.barra{
+  position:sticky; top:0; z-index:20;
+  background:var(--barra-fondo);
+  backdrop-filter:blur(12px) saturate(1.4);
+  border-bottom:1px solid var(--borde);
+}
+
+/* Cuando la sección trae foto, la barra se sube sobre el pie de esa foto
+   en lugar de ir debajo. Se sube exactamente su propio alto, así su borde
+   inferior cae justo en el borde inferior de la foto. El fondo pasa a ser
+   un velo del color de fondo del negocio, bastante transparente y muy
+   desenfocado: la foto se sigue intuyendo detrás, borrosa, y las pestañas
+   se leen igual. La clase la pone carta.js solo si hay banda. */
+.con-banda-seccion .barra{
+  margin-top:calc(-1 * var(--barra-alto));
+  background:var(--barra-velo);
+  backdrop-filter:blur(20px) saturate(1.2);
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+/* Barra apoyada en el borde de ARRIBA de la foto (ajuste "superior").
+   Aquí la barra NO sube: es la foto la que sube para montarse bajo ella,
+   de modo que la barra separa la portada de la foto de la sección. El
+   velo (fondo translúcido y desenfoque) se hereda del bloque de arriba;
+   solo cambia quién lleva el margen negativo. carta.js pone la clase en
+   el <body> y coloca la barra antes de la foto en el HTML. */
+.con-banda-seccion.barra-superior .barra{
+  margin-top:0;
+}
+.con-banda-seccion.barra-superior .cabecera-seccion{
+  margin-top:calc(-1 * var(--barra-alto));   /* la foto sube bajo la barra */
+}
+.barra__lista{
+  max-width:var(--ancho); margin:0 auto;
+  padding:0 8px;
+  display:flex;
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.barra__lista::-webkit-scrollbar{ display:none; }
+
+.barra__btn{
+  position:relative; flex-shrink:0;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:19px 14px 17px; min-height:56px;
+  border:none; background:none; cursor:pointer;
+  font-family:var(--ui); font-weight:500; font-size:.74rem;
+  letter-spacing:.15em; text-transform:uppercase;
+  color:var(--hueso-suave); white-space:nowrap;
+  transition:color .18s ease;
+}
+.barra__btn::after{
+  content:""; position:absolute; left:14px; right:14px; bottom:0;
+  height:2px; background:var(--ambar);
+  transform:scaleX(0); transform-origin:center;
+  transition:transform .24s cubic-bezier(.4,0,.2,1);
+}
+.barra__btn:hover{ color:var(--hueso-medio); }
+.barra__btn[aria-selected="true"]{ color:var(--hueso); }
+.barra__btn[aria-selected="true"]::after{ transform:scaleX(1); }
+
+/* =========================================================
+   FILTRO DE ALÉRGENOS (plegable)
+   Va al final de la página, justo encima del pie y pegado a él:
+   por eso lleva el borde ARRIBA (antes lo llevaba abajo).
+   ========================================================= */
+.filtro{
+  border-top:1px solid var(--borde);
+  background:var(--noche-alto);
+}
+
+/* Filtro colocado ARRIBA, justo debajo de la foto de la sección (ajuste
+   "arriba"). La línea cambia de lado: va debajo, separándolo de los
+   grupos, en vez de encima. Lo mueve de sitio carta.js. */
+.filtro--arriba{
+  border-top:none;
+  border-bottom:1px solid var(--borde);
+}
+.filtro__resumen{
+  display:flex; align-items:center; gap:10px;
+  max-width:var(--ancho); margin:0 auto;
+  padding:15px 20px; min-height:52px;
+  cursor:pointer; list-style:none;
+  font-size:.7rem; font-weight:500;
+  letter-spacing:.18em; text-transform:uppercase;
+  color:var(--hueso-medio);
+  transition:color .15s ease;
+}
+.filtro__resumen::-webkit-details-marker{ display:none; }
+.filtro__resumen:hover{ color:var(--hueso); }
+.filtro__marca{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:20px; height:20px; padding:0 6px; border-radius:100px;
+  background:var(--ladrillo); color:#fff;
+  font-size:.66rem; font-weight:700; letter-spacing:0;
+}
+.filtro__flecha{
+  width:16px; height:16px; margin-left:auto;
+  color:var(--hueso-suave);
+  transition:transform .2s ease;
+}
+.filtro[open] .filtro__flecha{ transform:rotate(180deg); }
+
+.filtro__cuerpo{
+  max-width:var(--ancho); margin:0 auto;
+  padding:0 20px 26px;
+}
+.filtro__ayuda{
+  margin:0 0 18px;
+  font-size:.86rem; line-height:1.5; color:var(--hueso-suave);
+  max-width:58ch; text-transform:none; letter-spacing:0;
+}
+.filtro__lista{
+  display:flex; flex-wrap:wrap; gap:8px;
+  margin:0; padding:0; list-style:none;
+}
+.filtro__boton{
+  display:inline-flex; align-items:center; gap:8px;
+  min-height:42px; padding:9px 15px;
+  border:1px solid var(--borde-claro); border-radius:100px;
+  background:transparent; color:var(--hueso-medio);
+  font-family:var(--ui); font-weight:500; font-size:.8rem;
+  cursor:pointer;
+  transition:border-color .15s ease, background .15s ease, color .15s ease;
+}
+.filtro__boton:hover{ border-color:var(--hueso-suave); color:var(--hueso); }
+.filtro__boton svg{ width:17px; height:17px; flex-shrink:0; color:var(--ambar-hondo); }
+.filtro__boton[aria-pressed="true"]{
+  background:var(--ladrillo); border-color:var(--ladrillo); color:#fff;
+}
+.filtro__boton[aria-pressed="true"] svg{ color:#fff; }
+
+.filtro__limpiar{
+  margin-top:18px; min-height:42px; padding:10px 22px;
+  border:none; border-bottom:1px solid var(--borde-claro);
+  background:none; color:var(--hueso-suave);
+  font-family:var(--ui); font-weight:500; font-size:.72rem;
+  letter-spacing:.14em; text-transform:uppercase; cursor:pointer;
+  transition:color .15s ease, border-color .15s ease;
+}
+.filtro__limpiar:hover{ color:var(--ambar); border-color:var(--ambar); }
+
+/* =========================================================
+   LIENZO: grupos de la sección elegida
+
+   El lienzo ya NO limita el ancho ni deja márgenes laterales: así las
+   bandas con foto pueden llegar de borde a borde de la pantalla.
+   Quien centra y limita el ancho es la clase .columna, que se aplica
+   solo a los bloques de texto (títulos sin foto, platos, avisos).
+   ========================================================= */
+.lienzo{
+  padding:0 0 68px;
+}
+.lienzo:focus{ outline:none; }
+
+/* Carril de lectura: centra y deja aire a los lados. */
+.columna{
+  max-width:var(--ancho);
+  margin-inline:auto;
+  padding-inline:20px;
+}
+
+.estado{
+  padding:70px 10px; text-align:center;
+  color:var(--hueso-suave); font-size:.94rem;
+}
+.estado--error{ color:var(--ladrillo); font-weight:500; }
+
+/* ---------- Encabezado de la sección ----------
+   Una banda con la foto de la sección y nada más: ni título ni línea,
+   porque el nombre ya lo canta la barra de pestañas de justo debajo.
+   La foto se ve tal cual, sin filtros ni degradado encima.
+
+   Va ENCIMA de la barra de secciones y pegada a ella, sin margen por
+   debajo: por eso vive en .cabecera-seccion y no dentro del lienzo.
+   Si la sección no tiene foto, aquí no se pinta nada. */
+.cabecera-seccion{ position:relative; z-index:1; }
+
+/* El alto lleva sumado el de la barra, que se le monta encima: así la
+   parte de foto que queda a la vista es mayor que antes, no menor. */
+.panel__cabecera--imagen{
+  position:relative;
+  height:clamp(185px, 40vw, 300px);
+  margin:0;
+  overflow:hidden;
+  background:var(--noche-alto);
+}
+.panel__imagen{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  display:block;
+  object-fit:cover;
+  filter:brightness(.62);   /* la misma penumbra que la portada: van seguidas */
+}
+
+/* ---------- Grupo (panel plegable) ----------
+   El grupo es ahora un PANEL PLEGABLE y elegante. Aparece CONTRAÍDO: con
+   el grupo cerrado solo se ve su encabezado —título, alerta e imagen,
+   igual que antes— más una flecha que invita a abrirlo. Al pulsar se
+   despliega la lista de platos. El plegado lo hace el navegador con
+   <details>/<summary>: carta.js solo cambió las etiquetas del encabezado,
+   no la lógica ni el contenido.
+
+   Cada panel se separa del siguiente con aire y se recorta con esquinas
+   suaves, para leerse como una pieza cerrada. En móvil deja un margen a
+   los lados; en escritorio se centra (ver la media query). */
+.grupo{
+  margin:20px 12px 0;
+  border:1px solid var(--borde);
+  border-radius:16px;
+  background:var(--noche-alto);
+  overflow:hidden;
+  transition:border-color .18s ease;
+}
+.grupo:first-child{ margin-top:30px; }
+.grupo[open],
+.grupo:hover{ border-color:var(--borde-claro); }
+
+/* Dentro del panel, el carril de lectura lo marca el propio panel: se
+   neutraliza .columna para no sumar el relleno lateral dos veces. */
+.grupo .columna{ max-width:none; margin-inline:0; padding-inline:0; }
+
+/* El encabezado es el resorte que abre y cierra (summary). Se oculta el
+   triangulito por defecto del navegador; la flecha propia lo sustituye. */
+.grupo__cabecera{
+  cursor:pointer; list-style:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.grupo__cabecera::-webkit-details-marker{ display:none; }
+
+/* La flecha que gira al desplegar, como en el filtro de alérgenos. */
+.grupo__flecha{
+  flex:none; width:20px; height:20px;
+  color:var(--hueso-suave);
+  transition:transform .22s ease, color .18s ease;
+}
+.grupo[open] .grupo__flecha{ transform:rotate(180deg); }
+.grupo__cabecera:hover .grupo__flecha{ color:var(--ambar); }
+
+/* Sin foto: título en cursiva, línea fina y flecha, en una fila cómoda
+   para el dedo. La línea se estira y separa el título de la flecha; si hay
+   alerta, baja a su propia línea sin deformar la píldora. */
+.grupo__cabecera--simple{
+  display:flex; flex-wrap:wrap; align-items:center;
+  gap:12px 16px;
+  padding:18px 16px; margin:0;
+}
+.grupo__cabecera--simple .grupo__titulo{ order:1; }
+.grupo__cabecera--simple .grupo__regla{ order:2; }
+.grupo__cabecera--simple .grupo__flecha{ order:3; }
+.grupo__cabecera--simple.grupo__cabecera--con-alerta::before{
+  content:""; order:4; flex-basis:100%; height:0; margin:0;
+}
+.grupo__cabecera--simple.grupo__cabecera--con-alerta .alerta{
+  order:5; flex:0 0 auto;
+}
+.grupo__titulo{
+  margin:0; flex-shrink:0;
+  font-family:var(--display); font-style:italic; font-weight:500;
+  font-size:1.3rem; letter-spacing:-.01em;
+  color:var(--ambar);
+}
+.grupo__regla{
+  flex:1; width:auto; height:1px; background:var(--borde);
+}
+
+/* Con foto: el encabezado ES la banda con la imagen. El título va
+   superpuesto abajo a la izquierda; la flecha, en una píldora, arriba a la
+   derecha, para que se vea siempre sobre la foto. */
+.grupo__cabecera--imagen{
+  position:relative;
+  min-height:clamp(120px, 26vw, 190px);
+  padding:0; margin:0;
+  overflow:hidden;
+  display:flex; align-items:flex-end;
+  background:var(--noche-hondo);
+}
+.grupo__imagen{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  display:block; object-fit:cover;
+  filter:brightness(.52);
+}
+/* Velo de abajo arriba: el título blanco se lee siempre sobre la foto. */
+.grupo__cabecera--imagen::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,.62), transparent 60%);
+  pointer-events:none;
+}
+/* El rótulo apila título y, debajo, la alerta del grupo si la hay. */
+.grupo__rotulo{
+  position:relative; z-index:2; width:100%;
+  padding:0 16px 16px;
+  display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+}
+.grupo__cabecera--imagen .grupo__titulo{
+  font-size:1.5rem; color:#FFFFFF;
+  text-shadow:0 2px 12px rgba(0,0,0,.6);
+}
+.grupo__cabecera--imagen .grupo__flecha{
+  position:absolute; top:12px; right:12px; z-index:3;
+  width:34px; height:34px; padding:7px;
+  border-radius:100px;
+  background:rgba(0,0,0,.42); backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.16);
+  color:#FFFFFF;
+}
+
+/* Si la foto del grupo falla, el encabezado cae al formato sobrio. */
+.grupo__cabecera--sin-imagen{
+  min-height:0; background:none;
+  display:flex; flex-wrap:wrap; align-items:center;
+  gap:12px 16px; padding:18px 16px;
+}
+.grupo__cabecera--sin-imagen::after{ display:none; }
+.grupo__cabecera--sin-imagen .grupo__rotulo{
+  position:static; width:auto; flex:1; padding:0;
+  flex-direction:row; flex-wrap:wrap; align-items:center; gap:12px 16px;
+}
+.grupo__cabecera--sin-imagen .grupo__titulo{
+  font-size:1.3rem; color:var(--ambar); text-shadow:none;
+}
+.grupo__cabecera--sin-imagen .grupo__flecha{
+  position:static; width:20px; height:20px; padding:0;
+  background:none; border:none; backdrop-filter:none;
+  color:var(--hueso-suave);
+}
+
+/* La lista de platos, ya desplegada, con relleno propio dentro del panel
+   para no tocar los bordes redondeados. */
+.grupo__items{
+  display:grid;
+  padding:2px 16px 8px;
+}
+
+/* ---------- Ítem ---------- */
+.item{
+  display:flex; align-items:flex-start; gap:16px;
+  padding:18px 0;
+  border-bottom:1px solid var(--borde);
+}
+/* El texto ocupa el ancho sobrante. min-width:0 evita que un nombre
+   largo ensanche la fila y aplaste la foto. */
+.item__cuerpo{ flex:1; min-width:0; }
+
+/* Foto del plato: cuadrada exacta, a la derecha. Solo aparece si el
+   plato tiene imagen; los demás se ven igual que antes. */
+.item__foto{
+  flex:0 0 auto;
+  width:88px; aspect-ratio:1/1;
+  border-radius:10px; overflow:hidden;
+  border:1px solid var(--borde); background:var(--noche-alto);
+}
+.item__foto img{
+  width:100%; height:100%;
+  display:block; object-fit:cover;
+}
+
+.item__linea{
+  display:flex; align-items:baseline; gap:16px;
+}
+.item__nombre{
+  margin:0;
+  font-family:var(--ui); font-weight:500; font-size:1.02rem;
+  line-height:1.35; color:var(--hueso);
+}
+.item__precio{
+  margin-left:auto; flex-shrink:0;
+  font-family:var(--display); font-weight:600; font-size:1.06rem;
+  color:var(--ambar); font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.item__descripcion{
+  margin:7px 0 0;
+  font-size:.88rem; line-height:1.5; color:var(--hueso-suave);
+  max-width:52ch;
+}
+
+.item__alergenos{
+  display:flex; flex-wrap:wrap; gap:6px;
+  margin:13px 0 0; padding:0; list-style:none;
+}
+.ficha{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:9px;
+  border:1px solid var(--borde-claro); background:var(--noche-alto);
+  color:var(--hueso-medio); cursor:help;
+}
+.ficha svg{ width:15px; height:15px; display:block; }
+.ficha--evitar{
+  background:var(--ladrillo); border-color:var(--ladrillo); color:#fff;
+}
+
+.item__limpio{
+  display:inline-block; margin-top:13px;
+  font-size:.68rem; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--salvia);
+}
+
+/* Plato con un alérgeno marcado */
+.item--evitar{
+  padding-left:16px;
+  border-left:2px solid var(--ladrillo);
+  background:linear-gradient(90deg, rgba(210,96,58,.09), transparent 55%);
+}
+.item__aviso{
+  display:flex; align-items:center; gap:7px;
+  margin:12px 0 0;
+  font-size:.74rem; font-weight:500;
+  letter-spacing:.06em; color:var(--ladrillo);
+}
+.item__aviso::before{
+  content:""; width:5px; height:5px; border-radius:50%;
+  background:var(--ladrillo); flex-shrink:0;
+}
+
+
+/* ---------- Etiquetas y alertas ----------
+   Las escribe el negocio desde el editor, una a una, y elige sus
+   colores. Por eso aquí solo se define la FORMA: el color llega
+   escrito en el propio elemento (carta.js lo calcula).
+
+   - .etiqueta: píldora corta y en versalitas («250 g», «Nuevo»).
+     Solo fondo, sin filo. Van en fila y saltan de línea solas
+     cuando no caben.
+   - .alerta: una sola por grupo, montada sobre la línea que sigue
+     al título. Lleva un filo tenue para no confundirse con ella. */
+.etiquetas{
+  display:flex; flex-wrap:wrap; gap:6px;
+  margin:9px 0 0; padding:0; list-style:none;
+}
+/* Cada plato puede llevar etiquetas encima y debajo de la descripción,
+   y cada montón necesita su propio aire: el de arriba cuelga de la
+   línea del nombre y el precio, y el de abajo va detrás de un párrafo,
+   que pide un poco más de separación. */
+.etiquetas--arriba{ margin-top:9px; }
+.etiquetas--abajo{ margin-top:12px; }
+.etiqueta{
+  display:inline-block;
+  max-width:100%;
+  padding:3px 10px;
+  border:none;
+  border-radius:999px;
+  font-size:.67rem; font-weight:600; line-height:1.55;
+  letter-spacing:.09em; text-transform:uppercase;
+  overflow-wrap:anywhere;
+}
+
+.alerta{
+  display:inline-flex; align-items:center; gap:7px;
+  max-width:100%;
+  padding:4px 12px 4px 10px;
+  border:1px solid transparent;
+  border-radius:999px;
+  font-size:.72rem; font-weight:500; line-height:1.45;
+  overflow-wrap:anywhere;
+}
+.alerta svg{
+  width:14px; height:14px;
+  display:block; flex-shrink:0;
+}
+
+/* La alerta va siempre la última del encabezado del grupo. En el móvil,
+   que se apila en columna, eso la deja debajo de la línea; en escritorio,
+   que va en fila, la manda al extremo derecho.
+   Es 'order', así que solo cambia lo que se ve: en el HTML sigue detrás
+   del título, que es lo que leen los lectores de pantalla. */
+.grupo__cabecera--simple.grupo__cabecera--con-alerta .alerta{ order:3; }
+
+/* =========================================================
+   PIE
+   ========================================================= */
+.pie{
+  border-top:1px solid var(--borde);
+  background:var(--noche-hondo);
+  padding:40px 20px 48px;
+  text-align:center;
+  color:var(--hueso-suave); font-size:.76rem;
+}
+.pie__marca{
+  display:block; width:26px; height:1px; margin:0 auto 22px;
+  background:var(--ambar);
+}
+.pie p{ margin:0 0 6px; }
+.pie__nota{ font-size:.72rem; color:var(--hueso-suave); }
+
+/* ---------- Mensajes del negocio ----------
+   Tarjetitas de texto que el dueño escribe desde la aplicación de
+   administración: horarios, avisos, agradecimientos… En pantalla
+   ancha se reparten en columnas; en el móvil van una debajo de otra. */
+.pie__bloques{
+  max-width:var(--ancho); margin:0 auto 30px;
+  display:grid; gap:22px 40px;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 340px));
+  justify-content:center;
+  text-align:center;
+}
+.pie__bloque-titulo{
+  margin:0 0 8px;
+  font-family:var(--display); font-weight:600; font-style:italic;
+  font-size:1.05rem; letter-spacing:-.01em;
+  color:var(--ambar);
+}
+.pie__bloque-texto{
+  margin:0;
+  font-size:.82rem; line-height:1.65;
+  color:var(--hueso-medio);
+  white-space:pre-line;   /* respeta los saltos de línea que escriba el dueño */
+}
+
+/* ---------- Redes sociales ----------
+   Abajo del todo. Iconos del color principal; al pasar por encima
+   se avivan un poco. */
+.pie__redes{
+  margin:30px auto 0; padding-top:26px;
+  max-width:var(--ancho);
+  border-top:1px solid var(--borde);
+  display:flex; justify-content:center; align-items:center;
+  gap:10px; flex-wrap:wrap;
+}
+.pie__red{
+  display:grid; place-items:center;
+  width:44px; height:44px;             /* zona cómoda para el dedo */
+  border-radius:50%;
+  color:var(--ambar);
+  transition:background .15s ease, transform .12s ease;
+}
+.pie__red svg{ width:22px; height:22px; }
+.pie__red:hover{ background:var(--acento-halo); transform:translateY(-1px); }
+
+/* =========================================================
+   PANTALLA ANCHA (>= 760px)
+   Los platos de cada grupo pasan a dos columnas.
+   ========================================================= */
+@media (min-width:760px){
+  .grupo__items{ grid-template-columns:1fr 1fr; column-gap:56px; }
+
+  /* Con más pantalla, el panel se centra y respira algo más, por fuera
+     (entre grupos) y por dentro (relleno del encabezado y de la lista). */
+  .grupo{ margin:30px auto 0; max-width:var(--ancho-banda); }
+  .grupo:first-child{ margin-top:40px; }
+  .grupo__cabecera--simple,
+  .grupo__cabecera--sin-imagen{ padding:22px 26px; }
+  .grupo__items{ padding:6px 26px 16px; }
+  .item__foto{ width:104px; }
+  /* La portada gana altura: se le pone un alto mínimo que crece con la
+     ventana (con tope, para que en un monitor muy alto no se desmadre)
+     y el rótulo se queda centrado dentro. El relleno sigue haciendo de
+     suelo: si el nombre es largo o hay logotipo, la portada crece sola. */
+  .cabecera{ justify-content:center; min-height:min(76vh, 740px); }
+  .cabecera__interior{ padding:144px 24px 138px; }
+  .idioma{ position:absolute; top:18px; right:24px; margin-top:0; }
+  .lienzo{ padding:0 0 84px; }
+  .columna{ padding-inline:24px; }
+
+  /* En escritorio la banda del grupo se vuelve una tira ancha y baja
+     DENTRO del propio panel; el título sigue abajo a la izquierda. */
+  .grupo__cabecera--imagen{
+    min-height:0;
+    aspect-ratio:5/1;
+    max-height:220px;
+  }
+  .grupo__rotulo{ padding:0 26px 20px; }
+  /* Si la foto del grupo falla, el encabezado vuelve a alto automático. */
+  .grupo__cabecera--sin-imagen{
+    aspect-ratio:auto;
+    max-height:none;
+  }
+  .barra__lista{ padding:0 16px; }
+  .barra__btn{ padding:20px 18px 18px; }
+  .barra__btn::after{ left:18px; right:18px; }
+  .filtro__resumen,
+  .filtro__cuerpo{ padding-left:24px; padding-right:24px; }
+
+  /* La alerta del grupo mantiene su línea propia bajo el título. */
+  .grupo__cabecera--simple.grupo__cabecera--con-alerta .alerta{ min-width:0; }
+}
+
+/* Encima de 1128px la barra se centra bajo el rótulo */
+@media (min-width:1128px){
+  .barra__lista{ justify-content:center; }
+}

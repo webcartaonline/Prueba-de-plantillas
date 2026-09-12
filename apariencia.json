@@ -1,0 +1,49 @@
+{
+  "colores": {
+    "principal": "#E9B44C",
+    "fondo": "#12100E",
+    "texto": "auto"
+  },
+  "identidad": {
+    "titulo": "Prueba Lab",
+    "eslogan": {
+      "es": "",
+      "en": ""
+    },
+    "logo": "",
+    "favicon": "img/favicon.png?v=mtxhks0g",
+    "fondo": {
+      "imagen": "img/portada.jpg?v=mtkrhwbs",
+      "foco": "centro"
+    }
+  },
+  "fuentes": {
+    "titulo": null,
+    "texto": null
+  },
+  "pagina": {
+    "barra": "superior",
+    "alergenos": "arriba"
+  },
+  "pie": {
+    "bloques": [
+      {
+        "titulo": "Texto de ejemplo",
+        "texto": "Este es un ejemplo de texto"
+      },
+      {
+        "titulo": "Segundo texto de ejemplo",
+        "texto": "Este es otro texto de ejemplo"
+      }
+    ],
+    "redes": {
+      "tiktok": "https://www.tiktok.com",
+      "instagram": "https://www.instagram.com",
+      "x": "https://www.x.com",
+      "youtube": "https://youtube.com",
+      "facebook": "https://facebook.com",
+      "snapchat": "https://snapchat.com"
+    }
+  },
+  "actualizado": "2026-09-12T12:11:29.499Z"
+}
